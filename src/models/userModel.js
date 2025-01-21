@@ -23,13 +23,7 @@ const userSchema = new mongoose.Schema({
     },
     phoneNumber: {
         type: String,
-        required: [true, 'Please provide your phone number'],
-        validate: {
-            validator: function(v) {
-                return /^\d{10}$/.test(v);
-            },
-            message: 'Please enter a valid 10-digit phone number'
-        }
+        required: [true, 'Please provide your phone number']
     },
     role: {
         type: String,
@@ -48,19 +42,22 @@ const userSchema = new mongoose.Schema({
 
 // Hash password before saving
 userSchema.pre('save', async function(next) {
+    // Only hash the password if it's modified
     if (!this.isModified('password')) return next();
+    
+    // Hash password with cost of 12
     this.password = await bcrypt.hash(this.password, 12);
     next();
 });
 
-// Method to check if password is correct
+// Method to check password
 userSchema.methods.correctPassword = async function(candidatePassword, userPassword) {
-  console.log('Comparing passwords:');
-  console.log('Candidate password:', candidatePassword);
-  console.log('Stored password:', userPassword);
-  const isMatch = await bcrypt.compare(candidatePassword, userPassword);
-  console.log('Password match:', isMatch);
-  return isMatch;
+    console.log('Comparing passwords:');
+    console.log('Candidate (plain):', candidatePassword);
+    console.log('Stored (hashed):', userPassword);
+    const isMatch = await bcrypt.compare(candidatePassword, userPassword);
+    console.log('Match result:', isMatch);
+    return isMatch;
 };
 
 const User = mongoose.model('User', userSchema);

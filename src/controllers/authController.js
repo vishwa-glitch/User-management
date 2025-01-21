@@ -43,36 +43,40 @@ exports.register = catchAsync(async (req, res, next) => {
 exports.login = catchAsync(async (req, res, next) => {
     const { email, password } = req.body;
 
-    // Check if email and password exist
+    // 1) Check if email and password exist
     if (!email || !password) {
         return next(new AppError('Please provide email and password!', 400));
     }
 
-    // Find user
+    // 2) Find user and explicitly select password
     const user = await User.findOne({ email, isActive: true }).select('+password');
     
     console.log('Login attempt for:', email);
-    
-    // Check if user exists and password is correct
-    if (!user || !(await user.correctPassword(password, user.password))) {
+    console.log('User found:', !!user);
+
+    if (!user) {
         return next(new AppError('Incorrect email or password', 401));
     }
 
-    // Generate token
+    // 3) Verify password
+    const isPasswordCorrect = await user.correctPassword(password, user.password);
+    console.log('Password check result:', isPasswordCorrect);
+
+    if (!isPasswordCorrect) {
+        return next(new AppError('Incorrect email or password', 401));
+    }
+
+    // 4) If everything ok, send token
     const token = generateToken(user._id);
 
-    // Send response
+    // Remove password from output
+    user.password = undefined;
+
     res.status(200).json({
         status: 'success',
         token,
         data: {
-            user: {
-                id: user._id,
-                name: user.name,
-                email: user.email,
-                phoneNumber: user.phoneNumber,
-                role: user.role
-            }
+            user
         }
     });
 });

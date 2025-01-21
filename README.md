@@ -42,7 +42,7 @@ Create a RESTful API for User Management System that demonstrates understanding 
 
 1. Clone the repository
 ```bash
-git clone <repository-url>
+git clone https://github.com/vishwa-glitch/User-management
 cd user-management-system
 ```
 
@@ -60,7 +60,7 @@ JWT_SECRET=your_jwt_secret_key
 
 4. Start the server
 ```bash
-npm run dev
+node server.js
 ```
 
 ## API Endpoints
