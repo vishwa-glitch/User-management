@@ -43,7 +43,7 @@ Create a RESTful API for User Management System that demonstrates understanding 
 1. Clone the repository
 ```bash
 git clone https://github.com/vishwa-glitch/User-management
-cd user-management-system
+cd src
 ```
 
 2. Install dependencies
